@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER_ID: ${USER_ID:-0}
+        GROUP_ID: ${GROUP_ID:-0}
+    tty: true
+    stdin_open: true
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - docker/.env/development/web
+      - docker/.env/development/redis
+
+  redis:
+    image: redis:6.2.3
+    privileged: true
+    ports:
+      - "6379:6379"
+
+volumes:
+  web_gem_cache:
