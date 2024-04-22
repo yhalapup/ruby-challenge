@@ -13,6 +13,12 @@ class UserController < ApplicationController
     @user.valid? if @user.created_at != @user.updated_at
   end
 
+  def destroy
+    user = User.find_by(id: params[:id])
+    user.destroy
+    redirect_to root_path
+  end
+
   def show
 
   end
