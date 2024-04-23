@@ -1,6 +1,5 @@
 import { Controller } from 'stimulus'
 import StimulusReflex from 'stimulus_reflex'
-import Cleave from 'cleave.js'
 
 /* This is your ApplicationController.
  * All StimulusReflex controllers should inherit from this class.

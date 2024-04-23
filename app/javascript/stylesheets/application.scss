@@ -1,3 +1,7 @@
 @import "~bootstrap/scss/bootstrap";
 
 html, body { background: aliceblue; }
+
+.not-displayed {
+  display: none;
+}

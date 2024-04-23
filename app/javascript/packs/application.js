@@ -8,7 +8,9 @@ import "../stylesheets/application"
 import Rails from "@rails/ujs"
 import * as ActiveStorage from "@rails/activestorage"
 import "channels"
+
 import "controllers"
+import "../utils/input_field_formatter"
 import $ from 'jquery';
 import debounced from 'debounced'
 debounced.initialize()
