@@ -18,6 +18,7 @@ services:
     env_file:
       - docker/.env/development/web
       - docker/.env/development/redis
+    privileged: true
 
   redis:
     image: redis:6.2.3
