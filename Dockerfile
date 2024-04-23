@@ -1,5 +1,15 @@
 FROM ruby:3.0.2
 
+ARG USER=appuser
+ARG GROUP=appuser
+ARG USER_ID
+ARG GROUP_ID
+
+RUN if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
+  groupadd -g ${GROUP_ID} ${GROUP} &&\
+  useradd -u ${USER_ID} -g ${GROUP} -s /bin/sh -m ${USER} \
+;fi
+
 RUN apt-get update && apt-get upgrade -y
 
 ARG NODE_VERSION="14.21.3"
@@ -60,6 +70,8 @@ RUN set -ex \
   && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
   # smoke test
   && yarn --version \
+
+USER ${USER}
 
 COPY ./Gemfile* /usr/src/app/
 WORKDIR /usr/src/app

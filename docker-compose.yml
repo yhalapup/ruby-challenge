@@ -9,8 +9,6 @@ services:
       args:
         USER_ID: ${USER_ID:-0}
         GROUP_ID: ${GROUP_ID:-0}
-    tty: true
-    stdin_open: true
     ports:
       - "3000:3000"
     volumes:
