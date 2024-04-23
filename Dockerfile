@@ -61,7 +61,6 @@ RUN set -ex \
   # smoke test
   && yarn --version \
 
-COPY Gemfile* /usr/src/app/
 COPY ./Gemfile* /usr/src/app/
 WORKDIR /usr/src/app
 RUN bundle install --jobs 4 --retry 3
