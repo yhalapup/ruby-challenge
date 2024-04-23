@@ -68,3 +68,5 @@ RUN bundle install --jobs 4 --retry 3
 COPY . /usr/src/app
 
 RUN yarn install
+
+CMD ["bin/rails", "s", "-b", "0.0.0.0"]
