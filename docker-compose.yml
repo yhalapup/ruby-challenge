@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
 
-  web:
+  app: &app
     build:
       context: .
       dockerfile: docker/dockerfiles/app.dockerfile
@@ -10,19 +10,32 @@ services:
       args:
         USER_ID: ${USER_ID:-0}
         GROUP_ID: ${GROUP_ID:-0}
-    entrypoint: /docker/entrypoints/app-entrypoint.sh
+    depends_on:
+      redis:
+        condition: service_healthy
     tty: true
     stdin_open: true
+#    entrypoint: /docker/entrypoints/app-entrypoint.sh
     ports:
       - "3000:3000"
     volumes:
       - .:/usr/src/app
+      - web_gem_cache:/usr/local/bundle/gems
     env_file:
       - docker/.env.development
     privileged: true
 
+
+
   redis:
     image: redis:6.2.3
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    restart: always
+    stop_grace_period: "3s"
     privileged: true
     ports:
       - "6379:6379"

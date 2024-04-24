@@ -15,8 +15,6 @@ services:
         condition: service_healthy
     entrypoint: /docker/entrypoints/app-entrypoint.sh
     restart: always
-    tty: true
-    stdin_open: true
     stop_grace_period: "3s"
     volumes:
       - .:/usr/src/app
@@ -32,9 +30,6 @@ services:
       retries: 30
     restart: always
     stop_grace_period: "3s"
-
-    privileged: true
-
 
   web:
     build:
