@@ -21,25 +21,6 @@ export default class extends ApplicationController {
     // add your code here, if applicable
   }
 
-  update(event) {
-    event.preventDefault()
-    console.log("UPDATE")
-    this.stimulate('User#update')
-  }
-
-  select_country(event) {
-    event.preventDefault()
-    console.log("SELECT COUNTRY")
-    let country = event.target.value;
-    if (country  == "United States") {
-      document.getElementById("other-country-input").classList.add("not-displayed");
-    } else if (country == "Other") {
-      document.getElementById("other-country-input").classList.remove("not-displayed")
-    }
-
-    console.log("event")
-
-  }
   /* Reflex specific lifecycle methods.
    *
    * For every method defined in your Reflex class, a matching set of lifecycle methods become available

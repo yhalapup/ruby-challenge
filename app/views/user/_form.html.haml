@@ -2,7 +2,7 @@
   .col-2
   .col-8
     .pt-5
-      = simple_form_for(user, defaults: { input_html: { data: { controller: "user", action: "debounced:input->user#update" } } }) do |f|
+      = simple_form_for(user, defaults: { input_html: { data: { reflex: "debounced:input->user#update" } } }) do |f|
         - custom_message = ->(attribute_name) { f.object.errors.full_messages_for(attribute_name).to_sentence }
 
         .row
@@ -30,7 +30,6 @@
           = f.input :country, as: :select, required: false,
                 collection: ['United States', 'Other'], include_blank: false,
                 selected: f.object.country ? f.object.country : 'United States',
-                input_html: { data: { controller: "user", action: "change->user#select_country" } } ,
                 error: custom_message.call(:country)
 
         .mb-2.pt-2#other-country-input
@@ -52,10 +51,3 @@
 
     .mb-2.text-end
       = link_to 'Back', root_path, class: 'button btn btn-primary'
-
-:javascript
-  document.addEventListener('DOMContentLoaded', function () {
-    if (document.getElementById("user_country").value == "United States") {
-      document.getElementById("other-country-input").classList.add("not-displayed")
-    }
-  });
