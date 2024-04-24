@@ -1,4 +1,5 @@
-FROM ruby:3.0.2
+ARG RUBY_VERSION=3.0.2
+FROM ruby:$RUBY_VERSION as base
 
 ARG USER=appuser
 ARG GROUP=appuser
@@ -10,7 +11,11 @@ RUN if [ ${USER_ID:-0} -ne 0 ] && [ ${GROUP_ID:-0} -ne 0 ]; then \
   useradd -u ${USER_ID} -g ${GROUP} -s /bin/sh -m ${USER} \
 ;fi
 
-RUN apt-get update && apt-get upgrade -y
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    git
 
 ARG NODE_VERSION="14.21.3"
 
@@ -69,16 +74,51 @@ RUN set -ex \
   && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
   && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
   # smoke test
-  && yarn --version \
+  && yarn --version
+
+FROM base as development
+
+ENV RAILS_ENV="${RAILS_ENV}" \
+    NODE_ENV="${NODE_ENV}"
+
+COPY --chown=${USER}:${GROUP} docker/entrypoints/development/app-entrypoint.sh /docker/entrypoints/app-entrypoint.sh
+RUN chmod +x /docker/entrypoints/app-entrypoint.sh
 
 USER ${USER}
 
-COPY ./Gemfile* /usr/src/app/
+COPY --chown=${USER}:${GROUP} ./Gemfile* /usr/src/app/
 WORKDIR /usr/src/app
 RUN bundle install --jobs 4 --retry 3
 
-COPY . /usr/src/app
+COPY --chown=${USER}:${GROUP} . /usr/src/app
 
 RUN yarn install
 
-CMD ["bin/rails", "s", "-b", "0.0.0.0"]
+FROM base as production
+
+RUN apt-get install -y nano vim
+
+ENV RAILS_ENV="${RAILS_ENV}" \
+    NODE_ENV="${NODE_ENV}" \
+    RAILS_SERVE_STATIC_FILES="${RAILS_SERVE_STATIC_FILES}" \
+    RAILS_LOG_TO_STDOUT="${RAILS_LOG_TO_STDOUT}" \
+    RAILS_MASTER_KEY="${RAILS_MASTER_KEY}"
+
+
+COPY --chown=${USER}:${GROUP} docker/entrypoints/production/app-entrypoint.sh /docker/entrypoints/app-entrypoint.sh
+RUN chmod +x /docker/entrypoints/app-entrypoint.sh
+
+USER ${USER}
+
+COPY --chown=${USER}:${GROUP} ./Gemfile* /usr/src/app/
+WORKDIR /usr/src/app
+
+RUN bundle config set without "development test"
+RUN bundle install --no-cache --jobs 4 --retry 3
+
+COPY --chown=${USER}:${GROUP} . /usr/src/app
+
+RUN yarn install --frozen-lockfile --production
+RUN RAILS_ENV=production NODE_ENV=production SECRET_KEY_BASE=1 bundle exec rails assets:precompile
+RUN yarn cache clean \
+    && rm -rf node_modules

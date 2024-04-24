@@ -31,6 +31,7 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+/config/production.key
 
 /public/packs
 /public/packs-test
@@ -50,3 +51,4 @@ dump.rdb
 .tool-versions
 
 /**/.DS_Store
+/config/credentials/production.key
