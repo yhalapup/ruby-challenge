@@ -81,7 +81,7 @@ FROM base as development
 ENV RAILS_ENV="${RAILS_ENV}" \
     NODE_ENV="${NODE_ENV}"
 
-COPY --chown=${USER}:${GROUP} docker/entrypoints/development/app-entrypoint.sh /docker/entrypoints/app-entrypoint.sh
+COPY --chown=${USER}:${GROUP} ./docker/entrypoints/development/app-entrypoint.sh /docker/entrypoints/app-entrypoint.sh
 RUN chmod +x /docker/entrypoints/app-entrypoint.sh
 
 USER ${USER}
@@ -105,7 +105,7 @@ ENV RAILS_ENV="${RAILS_ENV}" \
     RAILS_MASTER_KEY="${RAILS_MASTER_KEY}"
 
 
-COPY --chown=${USER}:${GROUP} docker/entrypoints/production/app-entrypoint.sh /docker/entrypoints/app-entrypoint.sh
+COPY --chown=${USER}:${GROUP} ./docker/entrypoints/production/app-entrypoint.sh /docker/entrypoints/app-entrypoint.sh
 RUN chmod +x /docker/entrypoints/app-entrypoint.sh
 
 USER ${USER}

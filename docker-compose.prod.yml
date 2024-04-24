@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/dockerfiles/app.dockerfile
+      target: production
+      args:
+        USER_ID: ${USER_ID:-0}
+        GROUP_ID: ${GROUP_ID:-0}
+    depends_on:
+      redis:
+        condition: service_healthy
+    entrypoint: /docker/entrypoints/app-entrypoint.sh
+    restart: always
+    tty: true
+    stdin_open: true
+    stop_grace_period: "3s"
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - docker/.env.production
+
+  redis:
+    image: redis:6.2.3
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    restart: always
+    stop_grace_period: "3s"
+
+    privileged: true
+
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/dockerfiles/web.dockerfile
+      args:
+        USER_ID: ${USER_ID:-0}
+        GROUP_ID: ${GROUP_ID:-0}
+    restart: always
+    depends_on:
+      app:
+        condition: service_started
+    ports:
+      - 80:80
+
+
+volumes:
+  web_gem_cache:
